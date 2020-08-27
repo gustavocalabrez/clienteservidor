@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
 from functools import wraps
-from os import environ
+import os
 
 app = Flask(__name__)
 
