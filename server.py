@@ -166,6 +166,6 @@ def update_usuario(user):
     return jsonify(), 200
 
 if __name__ == '__main__':
-    app.run(use_reloader=False,debug=True, environ.get('5000'))
+    app.run(use_reloader=False,debug=True,environ.get('5000'))
     
 
