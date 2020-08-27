@@ -167,6 +167,6 @@ def update_usuario(user):
 
 if __name__ == '__main__':
     
-    app.run(environ.get('5000'),use_reloader=False,debug=True)
+    app.run(environ.get('5000'),host='0.0.0.0',use_reloader=False,debug=True)
     
 
