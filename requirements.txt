@@ -7,4 +7,3 @@ uuid
 werkzeug
 jwt
 datetime
-functools
