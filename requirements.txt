@@ -1,0 +1,10 @@
+django
+gunicorn
+django-heroku
+flask
+psycopg2
+uuid
+werkzeug
+jwt
+datetime
+functools
