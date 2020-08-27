@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
 from functools import wraps
+from os import environ
 
 app = Flask(__name__)
 
@@ -165,4 +166,6 @@ def update_usuario(user):
     return jsonify(), 200
 
 if __name__ == '__main__':
-    app.run(use_reloader=False,debug=True)
+    app.run(use_reloader=False,debug=True, environ.get('5000'))
+    
+
