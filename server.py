@@ -169,9 +169,7 @@ def update_usuario(user):
     
     data = request.get_json()
 
-    user.name=data['name'],
-    user.password=data['password']
-    user.email=data['email']
+    user.name=data['name']
     user.zip_code=data['zip_code']
     user.latitude=data['latitude']
     user.longitude=data['longitude']
