@@ -60,6 +60,7 @@ def token_required(f):
 def create_user():
 
     data = request.get_json()
+    print(data)
     if not data:
         return make_response('Campos obrigatórios não preenchidos!', 400)
     elif not 'name' in data:
