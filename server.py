@@ -145,6 +145,7 @@ def get_one_user(user):
     user_data = {}
     user_data['_id'] = user._id
     user_data['name'] = user.name
+    user_data['email'] = user.email
     user_data['zip_code'] = user.zip_code
     user_data['latitude'] = user.latitude
     user_data['longitude'] = user.longitude
