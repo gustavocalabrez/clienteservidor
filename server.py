@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'ProjetoCliente'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:362683@localhost/Projeto'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://lbvqgqvznmjiga:38073c5210e934495c697ca6a1f3a292fb8141bc438bffd22dda277a9d557b7c@ec2-52-207-25-133.compute-1.amazonaws.com:5432/d3u9feds5198d3'
 
 db = SQLAlchemy(app)
 
