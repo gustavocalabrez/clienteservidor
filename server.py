@@ -159,7 +159,7 @@ def get_one_user(user):
     else:
         user_data['role'] = 'admin'
         
-    return jsonify({'user' : user_data})
+    return jsonify(user_data)
 
 @app.route('/user', methods=['PUT'])
 @token_required
