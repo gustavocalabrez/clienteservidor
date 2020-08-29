@@ -171,7 +171,8 @@ def get_one_user(user):
 def update_usuario(user):
     
     data = request.get_json()
-
+    print(data)
+    print(user)
     user.name=data['name']
     user.email=data['email']
     user.password=data['password']
