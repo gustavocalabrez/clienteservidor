@@ -119,7 +119,7 @@ def get_token():
 def login():
     global token_g
     auth = request.get_json()
-    auth = json.dumps(auth)
+    
     
     if not auth or not auth['email'] or not auth['password']:
         return make_response('', 401)
