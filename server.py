@@ -62,6 +62,7 @@ def create_user():
 
     data = request.get_json()
     data = json.dumps(data)
+    print(type(data),data)
     if not data:
         return make_response('Campos obrigatórios não preenchidos!', 400)
     elif not 'name' in data:
