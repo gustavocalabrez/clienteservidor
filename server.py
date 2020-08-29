@@ -148,7 +148,7 @@ def get_one_user(user):
     user_data = {}
     user_data['_id'] = user._id
     user_data['name'] = user.name
-    user_data['password'] = user.password
+    #user_data['password'] = user.password
     user_data['email'] = user.email
     user_data['zip_code'] = user.zip_code
     user_data['latitude'] = user.latitude
@@ -171,7 +171,6 @@ def get_one_user(user):
 def update_usuario(user):
     
     data = request.get_json()
-    data = json.dumps(data)
 
     user.name=data['name']
     user.email=data['email']
