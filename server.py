@@ -7,6 +7,7 @@ import jwt
 import datetime
 from functools import wraps
 import os
+import json
 
 app = Flask(__name__)
 
@@ -60,7 +61,7 @@ def token_required(f):
 def create_user():
 
     data = request.get_json()
-    print(data)
+    data = json.dumps(data)
     if not data:
         return make_response('Campos obrigatórios não preenchidos!', 400)
     elif not 'name' in data:
@@ -117,16 +118,18 @@ def get_token():
 @app.route('/login', methods=['POST'])
 def login():
     global token_g
-    auth = request.authorization
-    if not auth or not auth.username or not auth.password:
+    auth = request.get_json()
+    auth = json.dumps(auth)
+    
+    if not auth or not auth['email'] or not auth['password']:
         return make_response('', 401)
     
-    user = cliente.query.filter_by(email=auth.username).first()
+    user = cliente.query.filter_by(email=auth['email']).first()
 
     if not user:
         return make_response('', 401)
     
-    if user.password == auth.password:
+    if user.password == auth['password']:
         token = jwt.encode({'_id':user._id, 'name': user.name}, app.config['SECRET_KEY'])
         return jsonify({'token' : token.decode('UTF-8')})
     return make_response('', 401)
@@ -168,6 +171,7 @@ def get_one_user(user):
 def update_usuario(user):
     
     data = request.get_json()
+    data = json.dumps(data)
 
     user.name=data['name']
     user.email=data['email']
