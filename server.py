@@ -6,7 +6,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
 from functools import wraps
-import os
 
 app = Flask(__name__)
 
@@ -20,7 +19,7 @@ global token_g
 token_g = ''
 
 class cliente(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    _id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     email = db.Column(db.String(50))
     password = db.Column(db.String(80))
@@ -48,7 +47,7 @@ def token_required(f):
 
         try: 
             data = jwt.decode(token, app.config['SECRET_KEY'])
-            current_user = cliente.query.filter_by(id=data['id']).first()
+            current_user = cliente.query.filter_by(_id=data['_id']).first()
         except:
             return make_response('Except Token', 401)
 
@@ -60,6 +59,8 @@ def token_required(f):
 def create_user():
 
     data = request.get_json()
+    if not data['name']:
+        print('Teste')
     if not data or data['name'] == '' or data['password'] == '' or data['email'] == '' or data['zip_code'] == '' or data['latitude'] == 0.0 or data['longitude'] == 0.0 or data['city'] == '' or data['neighborhood'] == '' or data['street'] == '' or data['number'] == 0 or data['phone'] == '':
         return make_response('Campos obrigatórios não preenchidos!', 400)
     elif status_email(data['email']) == True:
@@ -90,13 +91,12 @@ def create_user():
 @app.route('/get_token', methods=['GET'])
 def get_token():
     global token_g
-    print(token_g)
     return token_g
 
 @app.route('/login', methods=['POST'])
 def login():
     global token_g
-    auth = request.authorization()
+    auth = request.authorization
     if not auth or not auth.username or not auth.password:
         return make_response('', 401)
     
@@ -106,7 +106,7 @@ def login():
         return make_response('', 401)
     
     if check_password_hash(user.password, auth.password):
-        token = jwt.encode({'id':user.id, 'name': user.name}, app.config['SECRET_KEY'])
+        token = jwt.encode({'_id':user._id, 'name': user.name}, app.config['SECRET_KEY'])
         return jsonify({'token' : token.decode('UTF-8')})
     return make_response('', 401)
     
@@ -122,7 +122,7 @@ def status_email(eMail):
 @token_required
 def get_one_user(user):
     user_data = {}
-    user_data['id'] = user.id
+    user_data['_id'] = user._id
     user_data['name'] = user.name
     user_data['zip_code'] = user.zip_code
     user_data['latitude'] = user.latitude
@@ -166,8 +166,5 @@ def update_usuario(user):
     return jsonify(), 200
 
 if __name__ == '__main__':
-    
     port = int(os.environ.get('PORT', 33507)) 
     app.run(host='0.0.0.0', port=port, use_reloader=False)
-    
-
