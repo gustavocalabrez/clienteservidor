@@ -145,6 +145,7 @@ def get_one_user(user):
     user_data = {}
     user_data['_id'] = user._id
     user_data['name'] = user.name
+    user_data['password'] = user.password
     user_data['email'] = user.email
     user_data['zip_code'] = user.zip_code
     user_data['latitude'] = user.latitude
@@ -168,10 +169,8 @@ def update_usuario(user):
     
     data = request.get_json()
 
-    hashed_password = generate_password_hash(data['password'], method='sha256')
-
     user.name=data['name'],
-    user.password=hashed_password
+    user.password=data['password']
     user.email=data['email']
     user.zip_code=data['zip_code']
     user.latitude=data['latitude']
