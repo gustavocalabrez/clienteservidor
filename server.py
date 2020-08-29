@@ -60,8 +60,8 @@ def token_required(f):
 def create_user():
 
     data = request.get_json()
-    if not data['name']:
-        print('Teste')
+    if not 'name' in data:
+        print('entrei')
     if not data or data['name'] == '' or data['password'] == '' or data['email'] == '' or data['zip_code'] == '' or data['latitude'] == 0.0 or data['longitude'] == 0.0 or data['city'] == '' or data['neighborhood'] == '' or data['street'] == '' or data['number'] == 0 or data['phone'] == '':
         return make_response('Campos obrigatórios não preenchidos!', 400)
     elif status_email(data['email']) == True:
