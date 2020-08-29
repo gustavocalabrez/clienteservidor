@@ -5,6 +5,6 @@ flask
 psycopg2
 uuid
 werkzeug
-jwt
 datetime
 flask_sqlalchemy
+pyjwt
