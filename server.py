@@ -87,10 +87,9 @@ def create_user():
     elif status_email(data['email']) == True:
         return make_response('', 409)
         
-    hashed_password = generate_password_hash(data['password'], method='sha256')
 
     new_user = cliente(name=data['name'],
-                    password=hashed_password,
+                    password=data['password'],
                     email=data['email'],
                     role=True,
                     zip_code=data['zip_code'],
@@ -126,7 +125,7 @@ def login():
     if not user:
         return make_response('', 401)
     
-    if check_password_hash(user.password, auth.password):
+    if user.password == auth.password:
         token = jwt.encode({'_id':user._id, 'name': user.name}, app.config['SECRET_KEY'])
         return jsonify({'token' : token.decode('UTF-8')})
     return make_response('', 401)
@@ -170,6 +169,8 @@ def update_usuario(user):
     data = request.get_json()
 
     user.name=data['name']
+    user.email=data['email']
+    user.password=data['password']
     user.zip_code=data['zip_code']
     user.latitude=data['latitude']
     user.longitude=data['longitude']
