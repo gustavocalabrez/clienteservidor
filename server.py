@@ -139,7 +139,7 @@ def status_email(eMail):
         return True
     return False
 
-@app.route('/me', methods=['POST'])
+@app.route('/me', methods=['GET'])
 @token_required
 def get_one_user(user):
     user_data = {}
