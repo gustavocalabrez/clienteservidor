@@ -89,7 +89,31 @@ def create_user():
     elif status_email(data['email']) == True:
         return make_response('', 409)
         
+    if data['name'] == '':
+        return make_response('Campos obrigatórios não preenchidos!',400)
+    elif data['password'] == '':
+        return make_response('Campos obrigatórios não preenchidos!',400)
+    elif data['email'] == '':
+        return make_response('Campos obrigatórios não preenchidos!',400)
+    elif data['zip_code'] == '':
+        return make_response('Campos obrigatórios não preenchidos!',400)
+    elif data['latitude'] == '' or data['latitude'] == 0.0:
+        return make_response('Campos obrigatórios não preenchidos!',400)
+    elif data['longitude'] == '' or data['longitude'] == 0.0:
+        return make_response('Campos obrigatórios não preenchidos!',400)
+    elif data['city'] == '':
+        return make_response('Campos obrigatórios não preenchidos!',400)
+    elif data['neighborhood'] == '':
+        return make_response('Campos obrigatórios não preenchidos!',400)
+    elif data['street'] == '':
+        return make_response('Campos obrigatórios não preenchidos!',400)
+    elif data['number'] == '' or data['number'] == 0:
+        return make_response('Campos obrigatórios não preenchidos!',400)
+    elif data['phone'] == '':
+        return make_response('Campos obrigatórios não preenchidos!',400)
+    
 
+   
     new_user = cliente(name=data['name'],
                     password=data['password'],
                     email=data['email'],
