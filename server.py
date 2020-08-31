@@ -90,7 +90,7 @@ def create_user():
     elif not 'phone' in data:
         return make_response('Campos obrigatórios não preenchidos!', 400)
     elif status_email(data['email']) == True:
-        return make_response('', 409, 'Access-Control-Allow-Origin'='*')
+        return make_response('', 409)
         
     if data['name'] == '':
         return make_response('Campos obrigatórios não preenchidos!',400)
@@ -135,7 +135,7 @@ def create_user():
     db.session.add(new_user)
     db.session.commit()
 
-    return  make_response('', 201, 'Access-Control-Allow-Origin'='*')
+    return  make_response('', 201)
 
 @app.route('/get_token', methods=['GET'])
 def get_token():
