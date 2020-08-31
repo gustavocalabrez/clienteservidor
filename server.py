@@ -132,7 +132,7 @@ def create_user():
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({'message' : 'Novo usuário criado!'})
+    return  make_response('', 201)
 
 @app.route('/get_token', methods=['GET'])
 def get_token():
@@ -212,7 +212,7 @@ def update_usuario(user):
 
     db.session.commit()
 
-    return jsonify(), 200
+    return make_response('', 200)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 33507)) 
