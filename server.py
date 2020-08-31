@@ -9,8 +9,11 @@ from functools import wraps
 import os
 import json
 
+
+
 app = Flask(__name__)
 
+app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SECRET_KEY'] = 'ProjetoCliente'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://lbvqgqvznmjiga:38073c5210e934495c697ca6a1f3a292fb8141bc438bffd22dda277a9d557b7c@ec2-52-207-25-133.compute-1.amazonaws.com:5432/d3u9feds5198d3'
@@ -87,7 +90,7 @@ def create_user():
     elif not 'phone' in data:
         return make_response('Campos obrigatórios não preenchidos!', 400)
     elif status_email(data['email']) == True:
-        return make_response('', 409)
+        return make_response('', 409, 'Access-Control-Allow-Origin'='*')
         
     if data['name'] == '':
         return make_response('Campos obrigatórios não preenchidos!',400)
@@ -132,7 +135,7 @@ def create_user():
     db.session.add(new_user)
     db.session.commit()
 
-    return  make_response('', 201)
+    return  make_response('', 201, 'Access-Control-Allow-Origin'='*')
 
 @app.route('/get_token', methods=['GET'])
 def get_token():
