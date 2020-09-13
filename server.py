@@ -302,7 +302,7 @@ def send_email():
     user.password = get_random_string()
     db.session.commit()
 
-    sg = sendgrid.SendGridAPIClient(apikey='qR37qnxDQLStUj3eemaOHg')
+    sg = sendgrid.SendGridAPIClient('qR37qnxDQLStUj3eemaOHg')
     from_email = Email("no-reply@projeto.com")
     subject = "Olá usuário "+user.name+"!\n\n Sua senha foi alterada para: "+user.password
     to_email = Email("emmanuel@alunos.utfpr.edu.br")
