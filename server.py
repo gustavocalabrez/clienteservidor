@@ -8,20 +8,27 @@ import datetime
 from functools import wraps
 import os
 import json
+from flask_cors import CORS
+import sendgrid
+import os
+from sendgrid.helpers.mail import *
+import random
+import string
 
+def get_random_string():
+    letters = string.ascii_letters
+    result_str = ''.join(random.choice(letters) for i in range(10))
+    return result_str
 
 
 app = Flask(__name__)
-
+CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SECRET_KEY'] = 'ProjetoCliente'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://lbvqgqvznmjiga:38073c5210e934495c697ca6a1f3a292fb8141bc438bffd22dda277a9d557b7c@ec2-52-207-25-133.compute-1.amazonaws.com:5432/d3u9feds5198d3'
 
 db = SQLAlchemy(app)
-
-global token_g
-token_g = ''
 
 class cliente(db.Model):
     _id = db.Column(db.Integer, primary_key=True)
@@ -38,6 +45,22 @@ class cliente(db.Model):
     complement = db.Column(db.String(40))
     phone = db.Column(db.String(15))
     role = db.Column(db.Boolean)
+
+class ocorrencia(db.Model):
+    _id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.String(100))
+    zip_code = db.Column(db.String(50))
+    street = db.Column(db.String(80))
+    type = db.Column(db.String(40))
+    ocurred_at = db.Column(db.DateTime)
+    user_id = db.Column(db.Integer)
+    anonymous = db.Column(db.Boolean)
+    neighborhood = db.Column(db.String(40))
+    latitude = db.Column(db.Float)
+    number = db.Column(db.Integer)
+    complement = db.Column(db.String(40))
+    longitude = db.Column(db.Float)
+    city = db.Column(db.String(50))
 
 def token_required(f):
     @wraps(f)
@@ -59,6 +82,56 @@ def token_required(f):
         return f(current_user, *args, **kwargs)
 
     return decorated
+
+@app.route('/create', methods=['POST'])
+def create_ocurrence():
+    data = request.get_json()
+    if not data:
+        return make_response('Campos obrigatórios não preenchidos!', 400)
+    elif not 'type' in data:
+        return make_response('Campos obrigatórios não preenchidos!', 400)
+    elif not 'ocurred_at' in data:
+        return make_response('Campos obrigatórios não preenchidos!', 400)
+    elif not 'user_id' in data:
+        return make_response('Campos obrigatórios não preenchidos!', 400)
+    elif not 'zip_code' in data:
+        return make_response('Campos obrigatórios não preenchidos!', 400)
+    elif not 'latitude' in data:
+        return make_response('Campos obrigatórios não preenchidos!', 400)
+    elif not 'longitude' in data:
+        return make_response('Campos obrigatórios não preenchidos!', 400)
+    elif not 'city' in data:
+        return make_response('Campos obrigatórios não preenchidos!', 400)
+    elif not 'neighborhood' in data:
+        return make_response('Campos obrigatórios não preenchidos!', 400)
+    elif not 'street' in data:
+        return make_response('Campos obrigatórios não preenchidos!', 400)
+    elif not 'anonymous' in data:
+        return make_response('Campos obrigatórios não preenchidos!', 400)
+    elif not 'description' in data:
+        return make_response('Campos obrigatórios não preenchidos!', 400)
+
+    ocurred = ocorrencia(type=data['type'],
+                    zip_code=data['zip_code'],
+                    latitude=data['latitude'],
+                    longitude=data['longitude'],
+                    city=data['city'],
+                    neighborhood=data['neighborhood'],
+                    street=data['street'],
+                    number=data['number'],
+                    complement=data['complement'],
+                    ocurred_at=data['ocurred_at'],
+                    description=data['description'],
+                    anonymous=data['anonymous'],
+                    user_id = data['user_id']
+                    )
+
+    db.session.add(ocurred)
+    db.session.commit()
+
+    get_all_ocurrence()
+    
+    return make_response('', 201)
     
 @app.route('/user', methods=['POST'])
 def create_user():
@@ -198,8 +271,6 @@ def get_one_user(user):
 def update_usuario(user):
     
     data = request.get_json()
-    print(data)
-    print(user)
     user.name=data['name']
     user.email=data['email']
     user.password=data['password']
@@ -216,6 +287,27 @@ def update_usuario(user):
     db.session.commit()
 
     return make_response('', 200)
+
+def get_all_ocurrence():
+    ocurred = ocorrencia.query.all()
+    for i in ocurred:
+        print(i)
+
+@app.route('/email', methods=['GET'])
+def send_email():
+    data = request.get_json()
+    user = cliente.query.filter_by(email=data['email']).first()
+    user.password = get_random_string()
+    db.session.commit()
+
+    sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
+    from_email = Email("no-reply@projeto.com")
+    subject = "Olá usuário "+user.name+"!\n\n Sua senha foi alterada para: "+user.password
+    to_email = Email("emmanuel@alunos.utfpr.edu.br")
+    content = Content("text/plain", "Mudança de senha")
+    mail = Mail(from_email, subject, to_email, content)
+    response = sg.client.mail.send.post(request_body=mail.get()) 
+    return make_response(subject, 200)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 33507)) 
