@@ -8,3 +8,5 @@ werkzeug
 datetime
 flask_sqlalchemy
 pyjwt
+flask_cors
+sendgrid
