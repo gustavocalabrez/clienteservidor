@@ -316,7 +316,7 @@ def send_email():
  
 
     
-    return make_response(subject, 200)
+    return make_response('', 200)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 33507)) 
