@@ -308,7 +308,7 @@ def send_email():
         subject='Sending with Twilio SendGrid is Fun',
         html_content='<strong>and easy to do anywhere, even with Python</strong>')
     try:
-        sg = SendGridAPIClient('qR37qnxDQLStUj3eemaOHg')
+        sg = SendGridAPIClient('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')
         response = sg.send(message)
     except Exception as e:
         print(e)
