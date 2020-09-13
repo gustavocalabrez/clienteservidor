@@ -9,11 +9,11 @@ from functools import wraps
 import os
 import json
 from flask_cors import CORS
-import sendgrid
 import os
-from sendgrid.helpers.mail import *
 import random
 import string
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 def get_random_string():
     letters = string.ascii_letters
@@ -302,28 +302,17 @@ def send_email():
     user.password = get_random_string()
     db.session.commit()
 
-    sg = sendgrid.SendGridAPIClient('qR37qnxDQLStUj3eemaOHg')
-    data = {
-      "personalizations": [
-        {
-          "to": [
-            {
-              "email": "gustavo.calabrez@gmail.com"
-            }
-          ],
-          "subject": "Hello World from the SendGrid Python Library!"
-        }
-      ],
-      "from": {
-        "email": "test@example.com"
-      },
-      "content": [
-        {
-          "type": "text/plain",
-          "value": "Hello, Email!"
-        }
-      ]
-    }
+    message = Mail(
+        from_email='from_email@example.com',
+        to_emails='to@example.com',
+        subject='Sending with Twilio SendGrid is Fun',
+        html_content='<strong>and easy to do anywhere, even with Python</strong>')
+    try:
+        sg = SendGridAPIClient('qR37qnxDQLStUj3eemaOHg')
+        response = sg.send(message)
+    except Exception as e:
+        print(e.message)
+
     response = sg.client.mail.send.post(request_body=data)
 
     
