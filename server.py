@@ -298,26 +298,41 @@ def get_all_ocurrence():
 
 @app.route('/email', methods=['GET'])
 def send_email():
-    data = request.get_json()
-    user = cliente.query.filter_by(email=data['email']).first()
-    user.password = get_random_string()
-    db.session.commit()
+   data = request.get_json()
+   user = cliente.query.filter_by(email=data['email']).first()
 
-    message = Mail(
-        from_email='gustavo.calabrez@gmail.com',
-        to_emails='gustavo.calabrez@gmail.com',
-        subject='Sending with Twilio SendGrid is Fun',
-        html_content='<strong>and easy to do anywhere, even with Python</strong>')
-    try:
-        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-        response = sg.send(message)
-    except Exception as e:
-        print(e)
+   if not user:
+       return make_response('', 401)
 
- 
+   user.password = get_random_string()
+   db.session.commit()
 
-    
-    return make_response('', 200)
+   gmail_user = 'projeto.utfpr.cliente@gmail.com'
+   gmail_password = '321garbuio'
+
+   sent_from = gmail_user
+   to = [data['email']]
+   subject = 'ALTERACAO DE SENHA - PROJETO CLIENTE SERVIDOR'
+   body = "Ola usuario "+user.name+"!\n\n Sua senha foi alterada para: "+user.password
+
+   email_text = """\
+   From: %s
+   To: %s
+   Subject: %s
+
+   %s
+   """ % (sent_from, ", ".join(to), subject, body)
+
+   try:
+       server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+       server.ehlo()
+       server.login(gmail_user, gmail_password)
+       server.sendmail(sent_from, to, email_text)
+       server.close()
+   except:
+       print("Erro")
+
+   return make_response(body, 200)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 33507)) 
