@@ -303,13 +303,31 @@ def send_email():
     db.session.commit()
 
     sg = sendgrid.SendGridAPIClient('qR37qnxDQLStUj3eemaOHg')
-    from_email = Email("no-reply@projeto.com")
-    subject = "Olá usuário "+user.name+"!\n\n Sua senha foi alterada para: "+user.password
-    to_email = Email("emmanuel@alunos.utfpr.edu.br")
-    content = Content("text/plain", "Mudança de senha")
-    mail = Mail(from_email, subject, to_email, content)
-    response = sg.client.mail.send.post(request_body=mail.get()) 
-    return make_response(subject, 200)
+    data = {
+      "personalizations": [
+        {
+          "to": [
+            {
+              "email": "gustavo.calabrez@gmail.com"
+            }
+          ],
+          "subject": "Hello World from the SendGrid Python Library!"
+        }
+      ],
+      "from": {
+        "email": "test@example.com"
+      },
+      "content": [
+        {
+          "type": "text/plain",
+          "value": "Hello, Email!"
+        }
+      ]
+    }
+    response = sg.client.mail.send.post(request_body=data)
+
+    
+     return make_response(subject, 200)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 33507)) 
