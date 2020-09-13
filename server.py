@@ -304,7 +304,7 @@ def send_email():
     db.session.commit()
 
     message = Mail(
-        from_email='from_email@example.com',
+        from_email='gustavo.calabrez@gmail.com',
         to_emails='gustavo.calabrez@gmail.com',
         subject='Sending with Twilio SendGrid is Fun',
         html_content='<strong>and easy to do anywhere, even with Python</strong>')
