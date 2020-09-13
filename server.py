@@ -311,9 +311,9 @@ def send_email():
         sg = SendGridAPIClient('qR37qnxDQLStUj3eemaOHg')
         response = sg.send(message)
     except Exception as e:
-        print(e.message)
+        print(e)
 
-    response = sg.client.mail.send.post(request_body=data)
+ 
 
     
     return make_response(subject, 200)
