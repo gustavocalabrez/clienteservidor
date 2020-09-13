@@ -15,6 +15,7 @@ import string
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
+
 def get_random_string():
     letters = string.ascii_letters
     result_str = ''.join(random.choice(letters) for i in range(10))
@@ -308,7 +309,7 @@ def send_email():
         subject='Sending with Twilio SendGrid is Fun',
         html_content='<strong>and easy to do anywhere, even with Python</strong>')
     try:
-        sg = SendGridAPIClient('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')
+        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
     except Exception as e:
         print(e)
