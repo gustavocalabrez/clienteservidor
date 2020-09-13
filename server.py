@@ -28,6 +28,8 @@ app.config['SECRET_KEY'] = 'ProjetoCliente'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://lbvqgqvznmjiga:38073c5210e934495c697ca6a1f3a292fb8141bc438bffd22dda277a9d557b7c@ec2-52-207-25-133.compute-1.amazonaws.com:5432/d3u9feds5198d3'
 
+
+
 db = SQLAlchemy(app)
 
 class cliente(db.Model):
@@ -300,7 +302,7 @@ def send_email():
     user.password = get_random_string()
     db.session.commit()
 
-    sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
+    sg = sendgrid.SendGridAPIClient(apikey='qR37qnxDQLStUj3eemaOHg')
     from_email = Email("no-reply@projeto.com")
     subject = "Olá usuário "+user.name+"!\n\n Sua senha foi alterada para: "+user.password
     to_email = Email("emmanuel@alunos.utfpr.edu.br")
