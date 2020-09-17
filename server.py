@@ -193,7 +193,7 @@ def create_ocurrence(user):
             user_data['street'] = i.street
             user_data['number'] = i.number
             user_data['complement'] = i.complement
-            user_data['ocurred_at'] = datetime.datetime.fromtimestamp(i.ocurred_at).isoformat()
+            user_data['ocurred_at'] = datetime.datetime.fromtimestamp(i.ocurred_at)
             user_data['description'] = i.description
             user_data['anonymous'] =  i.anonymous
             if i.anonymous == False:
