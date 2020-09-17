@@ -9,12 +9,14 @@ from functools import wraps
 import os
 import json
 from flask_cors import CORS
+import sendgrid
 import os
+from sendgrid.helpers.mail import *
 import random
 import string
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
-
+import smtplib
+import datetime
+import requests
 
 def get_random_string():
     letters = string.ascii_letters
@@ -28,8 +30,6 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SECRET_KEY'] = 'ProjetoCliente'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://lbvqgqvznmjiga:38073c5210e934495c697ca6a1f3a292fb8141bc438bffd22dda277a9d557b7c@ec2-52-207-25-133.compute-1.amazonaws.com:5432/d3u9feds5198d3'
-
-
 
 db = SQLAlchemy(app)
 
@@ -55,7 +55,7 @@ class ocorrencia(db.Model):
     zip_code = db.Column(db.String(50))
     street = db.Column(db.String(80))
     type = db.Column(db.String(40))
-    ocurred_at = db.Column(db.DateTime)
+    ocurred_at = db.Column(db.Integer)
     user_id = db.Column(db.Integer)
     anonymous = db.Column(db.Boolean)
     neighborhood = db.Column(db.String(40))
@@ -86,111 +86,205 @@ def token_required(f):
 
     return decorated
 
-@app.route('/create', methods=['POST'])
-def create_ocurrence():
-    data = request.get_json()
-    if not data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'type' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'ocurred_at' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'user_id' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'zip_code' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'latitude' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'longitude' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'city' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'neighborhood' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'street' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'anonymous' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'description' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
+@app.route('/ocurrences', methods=['POST', 'GET'])
+@token_required
+def create_ocurrence(user):
+    if request.method == 'POST':
+        data = request.get_json()
+        error = 0
+        response = 'Campos obrigatórios não preenchidos em: '
+        if not 'type' in data:
+            error = 1
+            response += 'type '
+        if not 'ocurred_at' in data:
+            error = 1
+            response += 'ocurred_at '
+        if not 'zip_code' in data:
+            error = 1
+            response += 'zip_code '
+        if not 'latitude' in data:
+            error = 1
+            response += 'latitude '
+        if not 'longitude' in data:
+            error = 1
+            response += 'longitude '
+        if not 'city' in data:
+            error = 1
+            response += 'city '
+        if not 'neighborhood' in data:
+            error = 1
+            response += 'neighborhood '
+        if not 'street' in data:
+            error = 1
+            response += 'street '
+        if not 'anonymous' in data:
+            error = 1
+            response += 'anonymous '
+        if not 'description' in data:
+            error = 1
+            response += 'description '
+        if error == 1:
+            return jsonify({'error':response}), 400
 
-    ocurred = ocorrencia(type=data['type'],
-                    zip_code=data['zip_code'],
-                    latitude=data['latitude'],
-                    longitude=data['longitude'],
-                    city=data['city'],
-                    neighborhood=data['neighborhood'],
-                    street=data['street'],
-                    number=data['number'],
-                    complement=data['complement'],
-                    ocurred_at=data['ocurred_at'],
-                    description=data['description'],
-                    anonymous=data['anonymous'],
-                    user_id = data['user_id']
-                    )
+        if data['type'] == '':
+            error = 1
+            response += 'type '
+        if data['ocurred_at'] == '':
+            error = 1
+            response += 'ocurred_at '
+        if data['zip_code'] == '':
+            error = 1
+            response += 'zip_code '
+        if data['latitude'] == '' or data['latitude'] == 0:
+            error = 1
+            response += 'latitude '
+        if data['longitude'] == ''or data['longitude'] == 0:
+            error = 1
+            response += 'longitude '
+        if data['city'] == '':
+            error = 1
+            response += 'city '
+        if data['neighborhood'] == '':
+            error = 1
+            response += 'neighborhood '
+        if data['street'] == '':
+            error = 1
+            response += 'street '
+        if data['anonymous'] == '':
+            error = 1
+            response += 'anonymous '
+        if data['description'] == '':
+            error = 1
+            response += 'description '
+        if error == 1:
+            return jsonify({'error':response}), 400
 
-    db.session.add(ocurred)
-    db.session.commit()
+        ocurred = ocorrencia(type=data['type'],
+                        zip_code=data['zip_code'],
+                        latitude=data['latitude'],
+                        longitude=data['longitude'],
+                        city=data['city'],
+                        neighborhood=data['neighborhood'],
+                        street=data['street'],
+                        number=data['number'],
+                        complement=data['complement'],
+                        ocurred_at=data['ocurred_at'],
+                        description=data['description'],
+                        anonymous=data['anonymous'],
+                        user_id = user._id
+                        )
 
-    get_all_ocurrence()
-    
-    return make_response('', 201)
+        db.session.add(ocurred)
+        db.session.commit()
+        
+        return make_response('', 201)
+    elif request.method == 'GET':
+        ocurred = ocorrencia.query.all()
+        all_data = []
+        for i in ocurred:
+            user_data = {}
+            user_data['_id'] = i._id
+            user_data['type'] = i.type
+            user_data['zip_code'] = i.zip_code
+            user_data['latitude'] = i.latitude
+            user_data['longitude'] = i.longitude
+            user_data['city'] = i.city
+            user_data['neighborhood'] = i.neighborhood
+            user_data['street'] = i.street
+            user_data['number'] = i.number
+            user_data['complement'] = i.complement
+            user_data['ocurred_at'] = datetime.datetime.fromtimestamp(i.ocurred_at).isoformat()
+            user_data['description'] = i.description
+            user_data['anonymous'] =  i.anonymous
+            if i.anonymous == False:
+                user_d = cliente.query.filter_by(_id=i.user_id).first()
+                user_data['user_name'] = user_d.name
+                user_data['user_id'] = i.user_id
+            all_data.append(user_data)
+        return jsonify(all_data)
     
 @app.route('/user', methods=['POST'])
 def create_user():
 
     data = request.get_json()
+
+    error = 0
+    response = 'Campos obrigatórios não preenchidos em: '
+    if not 'name' in data:
+        error = 1
+        response += 'name '
+    if not 'password' in data:
+        error = 1
+        response += 'password ' 
+    if not 'email' in data:
+        error = 1
+        response += 'email '        
+    if not 'zip_code' in data:
+        error = 1
+        response += 'zip_code '        
+    if not 'latitude' in data:
+        error = 1
+        response += 'latitude '        
+    if not 'longitude' in data:
+        error = 1
+        response += 'longitude '        
+    if not 'city' in data:
+        error = 1
+        response += 'city '        
+    if not 'neighborhood' in data:
+        error = 1
+        response += 'neighborhood '        
+    if not 'street' in data:
+        error = 1
+        response += 'street '        
+    if not 'number' in data:
+        error = 1
+        response += 'number '       
+    if not 'phone' in data:
+        error = 1
+        response += 'phone '        
+
+    if error == 1:
+        return jsonify({'error':response}), 400
     
-    if not data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'name' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'password' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'email' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'zip_code' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'latitude' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'longitude' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'city' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'neighborhood' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'street' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'number' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif not 'phone' in data:
-        return make_response('Campos obrigatórios não preenchidos!', 400)
-    elif status_email(data['email']) == True:
-        return make_response('', 409)
+    if status_email(data['email']) == True:
+        return jsonify({'error':response}), 400
         
     if data['name'] == '':
-        return make_response('Campos obrigatórios não preenchidos!',400)
-    elif data['password'] == '':
-        return make_response('Campos obrigatórios não preenchidos!',400)
-    elif data['email'] == '':
-        return make_response('Campos obrigatórios não preenchidos!',400)
-    elif data['zip_code'] == '':
-        return make_response('Campos obrigatórios não preenchidos!',400)
-    elif data['latitude'] == '' or data['latitude'] == 0.0:
-        return make_response('Campos obrigatórios não preenchidos!',400)
-    elif data['longitude'] == '' or data['longitude'] == 0.0:
-        return make_response('Campos obrigatórios não preenchidos!',400)
-    elif data['city'] == '':
-        return make_response('Campos obrigatórios não preenchidos!',400)
-    elif data['neighborhood'] == '':
-        return make_response('Campos obrigatórios não preenchidos!',400)
-    elif data['street'] == '':
-        return make_response('Campos obrigatórios não preenchidos!',400)
-    elif data['number'] == '' or data['number'] == 0:
-        return make_response('Campos obrigatórios não preenchidos!',400)
-    elif data['phone'] == '':
-        return make_response('Campos obrigatórios não preenchidos!',400)
-    
+        error = 1
+        response += 'name '
+    if data['password'] == '':
+        error = 1
+        response += 'password '
+    if data['email'] == '':
+        error = 1
+        response += 'email ' 
+    if data['zip_code'] == '':
+        error = 1
+        response += 'zip_code '
+    if data['latitude'] == '' or data['latitude'] == 0.0:
+        error = 1
+        response += 'latitude '
+    if data['longitude'] == '' or data['longitude'] == 0.0:
+        error = 1
+        response += 'longitude '
+    if data['city'] == '':
+        error = 1
+        response += 'city '
+    if data['neighborhood'] == '':
+        error = 1
+        response += 'neighborhood '
+    if data['street'] == '':
+        error = 1
+        response += 'street '
+    if data['number'] == '' or data['number'] == 0:
+        error = 1
+        response += 'number ' 
+    if data['phone'] == '':
+        error = 1
+        response += 'phone '
+    if error == 1:
+        return jsonify({'error':response}), 400
 
    
     new_user = cliente(name=data['name'],
@@ -276,7 +370,8 @@ def update_usuario(user):
     data = request.get_json()
     user.name=data['name']
     user.email=data['email']
-    user.password=data['password']
+    if data['password'] != '':
+        user.password=data['password']
     user.zip_code=data['zip_code']
     user.latitude=data['latitude']
     user.longitude=data['longitude']
@@ -291,48 +386,20 @@ def update_usuario(user):
 
     return make_response('', 200)
 
-def get_all_ocurrence():
-    ocurred = ocorrencia.query.all()
-    for i in ocurred:
-        print(i)
-
-@app.route('/email', methods=['GET'])
+@app.route('/email', methods=['post'])
 def send_email():
-   data = request.get_json()
-   user = cliente.query.filter_by(email=data['email']).first()
+    data = request.get_json()
+    user = cliente.query.filter_by(email=data['email']).first()
 
-   if not user:
-       return make_response('', 401)
-
-   user.password = get_random_string()
-   db.session.commit()
-
-   gmail_user = 'projeto.utfpr.cliente@gmail.com'
-   gmail_password = '321garbuio'
-
-   sent_from = gmail_user
-   to = [data['email']]
-   subject = 'ALTERACAO DE SENHA - PROJETO CLIENTE SERVIDOR'
-   body = "Ola usuario "+user.name+"!\n\n Sua senha foi alterada para: "+user.password
-
-   email_text = """\
-   From: %s
-   To: %s
-   Subject: %s
-
-   %s
-   """ % (sent_from, ", ".join(to), subject, body)
-
-   try:
-       server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-       server.ehlo()
-       server.login(gmail_user, gmail_password)
-       server.sendmail(sent_from, to, email_text)
-       server.close()
-   except:
-       print("Erro")
-
-   return make_response(body, 200)
+    if not user:
+        return make_response('', 401)
+    
+    user.password = get_random_string()
+    db.session.commit()
+    
+    res = requests.post("https://app.mailgun.com/app/sending/domains/sandbox95b89fc6b6ae4d0ca05d927859975cbe.mailgun.org/messages",auth=("api", "1b701db847dbded340c3ce1783d7c208-d5e69b0b-1ebfd0ea"),data={"from": "Teste Cliente <test@projeto.com.br>","to": ["emmanuel@alunos.utfpr.edu.br"],"subject": "Hello","text": "Ola usuario "+user.name+"!\n\n Sua senha foi alterada para: "+user.password})
+    print(res)
+    return make_response('', 201)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 33507)) 
