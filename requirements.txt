@@ -10,3 +10,4 @@ flask_sqlalchemy
 pyjwt
 flask_cors
 sendgrid
+requests
