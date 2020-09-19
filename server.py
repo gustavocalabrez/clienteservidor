@@ -18,7 +18,9 @@ import smtplib
 import datetime
 import requests
 
-global API_MAILGUN = os.environ['API_MAILGUN']
+global API_MAILGUN
+
+API_MAILGUN = os.environ['API_MAILGUN']
 
 
 def get_random_string():
