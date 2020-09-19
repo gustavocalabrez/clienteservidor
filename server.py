@@ -403,13 +403,7 @@ def send_email():
     user.password = get_random_string()
     db.session.commit()
     
-	return requests.post(
-		"https://api.mailgun.net/v3/sandbox53ca05e8db7d4f85a7d2fb33de8302f9.mailgun.org/messages",
-		auth=("api", API_MAILGUN),
-		data={"from": "Mailgun Sandbox <postmaster@sandbox53ca05e8db7d4f85a7d2fb33de8302f9.mailgun.org>",
-			"to": "GUSTAVO TADEU MIRANDA CALABREZ <gustavo.calabrez@gmail.com>",
-			"subject": "Hello GUSTAVO TADEU MIRANDA CALABREZ",
-			"text": "Congratulations GUSTAVO TADEU MIRANDA CALABREZ, you just sent an email with Mailgun!  You are truly awesome!"})
+    return requests.post( "https://api.mailgun.net/v3/sandbox53ca05e8db7d4f85a7d2fb33de8302f9.mailgun.org/messages", auth=("api", API_MAILGUN), data={"from": "Mailgun Sandbox <postmaster@sandbox53ca05e8db7d4f85a7d2fb33de8302f9.mailgun.org>", "to": "GUSTAVO TADEU MIRANDA CALABREZ <gustavo.calabrez@gmail.com>", "subject": "Hello GUSTAVO TADEU MIRANDA CALABREZ", "text": "Congratulations GUSTAVO TADEU MIRANDA CALABREZ, you just sent an email with Mailgun!  You are truly awesome!"})
 
 
 if __name__ == '__main__':
