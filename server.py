@@ -18,6 +18,9 @@ import smtplib
 import datetime
 import requests
 
+global API_MAILGUN = os.environ['API_MAILGUN']
+
+
 def get_random_string():
     letters = string.ascii_letters
     result_str = ''.join(random.choice(letters) for i in range(10))
@@ -388,6 +391,7 @@ def update_usuario(user):
 
 @app.route('/email', methods=['post'])
 def send_email():
+    global API_MAILGUN
     data = request.get_json()
     user = cliente.query.filter_by(email=data['email']).first()
 
@@ -397,9 +401,14 @@ def send_email():
     user.password = get_random_string()
     db.session.commit()
     
-    res = requests.post("https://app.mailgun.com/app/sending/domains/sandbox95b89fc6b6ae4d0ca05d927859975cbe.mailgun.org/messages",auth=("api", "1b701db847dbded340c3ce1783d7c208-d5e69b0b-1ebfd0ea"),data={"from": "Teste Cliente <test@projeto.com.br>","to": ["emmanuel@alunos.utfpr.edu.br"],"subject": "Hello","text": "Ola usuario "+user.name+"!\n\n Sua senha foi alterada para: "+user.password})
-    print(res)
-    return make_response('', 201)
+	return requests.post(
+		"https://api.mailgun.net/v3/sandbox53ca05e8db7d4f85a7d2fb33de8302f9.mailgun.org/messages",
+		auth=("api", API_MAILGUN),
+		data={"from": "Mailgun Sandbox <postmaster@sandbox53ca05e8db7d4f85a7d2fb33de8302f9.mailgun.org>",
+			"to": "GUSTAVO TADEU MIRANDA CALABREZ <gustavo.calabrez@gmail.com>",
+			"subject": "Hello GUSTAVO TADEU MIRANDA CALABREZ",
+			"text": "Congratulations GUSTAVO TADEU MIRANDA CALABREZ, you just sent an email with Mailgun!  You are truly awesome!"})
+
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 33507)) 
