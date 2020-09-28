@@ -119,27 +119,26 @@ def get_ocurrence(user, role, ocurrence_id):
         return jsonify(user_data)
     elif request.method == 'PUT':
         i = request.get_json()
-        print(i)
-        #user_data = ocorrencia.query.filter_by(_id = i['_id']).first()
-        #user_data['type'] = i.type
-        #user_data['zip_code'] = i.zip_code
-        #user_data['latitude'] = i.latitude
-        #user_data['longitude'] = i.longitude
-        #user_data['city'] = i.city
-        #user_data['neighborhood'] = i.neighborhood
-        #user_data['street'] = i.street
-        #user_data['number'] = i.number
-        #user_data['complement'] = i.complement
-        #user_data['ocurred_at'] = i.ocurred_at
-        #user_data['description'] = i.description
-        #user_data['anonymous'] =  i.anonymous
-        #if i.anonymous == False:
-            #user_d = cliente.query.filter_by(_id=i.user_id).first()
-            #if not user_d:
-                #return make_response('Usuário não existe',400)
-            #user_data['user_name'] = user_d.name
-            #user_data['user_id'] = i.user_id
-        #db.session.commit()
+        user_data = ocorrencia.query.filter_by(_id = i['_id']).first()
+        user_data.type = i['type']
+        user_data.zip_code = i['zip_code']
+        user_data.latitude = i['latitude']
+        user_data.longitude = i['longitude']
+        user_data.city = i['city']
+        user_data.neighborhood = i['neighborhood']
+        user_data.street = i['street']
+        user_data.number = i['number']
+        user_data.complement = i['complement']
+        user_data.ocurred_at = i['ocurred_at']
+        user_data.description = i['description']
+        user_data.anonymous =  i['anonymous']
+        if i['anonymous'] == False:
+            user_d = cliente.query.filter_by(_id=i['user_id']).first()
+            if not user_d:
+                return make_response('Usuário não existe',400)
+            user_data.user_name = user_d.name
+            user_data.user_id = i['user_id']
+        db.session.commit()
         return make_response('', 200)
     
 @app.route('/ocurrences/me', methods=['GET'])
