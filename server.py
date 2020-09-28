@@ -142,10 +142,8 @@ def get_ocurrence(user, role, ocurrence_id):
         return make_response('', 200)
     elif request.method == 'DELETE':
         i = request.get_json()
-        print(i)
-        #user_data = ocorrencia.query.filter_by(_id = i['_id']).first()
-        #db.session.delete(user_data)
-        #db.session.commit()
+        ocorrencia.query.filter_by(_id = i['_id']).delete()
+        db.session.commit()
         return make_response('', 200)
 @app.route('/ocurrences/me', methods=['GET'])
 @token_required
