@@ -87,13 +87,17 @@ def token_required(f):
         except:
             return make_response('Except Token', 401)
 
-        return f(current_user, *args, **kwargs)
+        return f(current_user, data['role'], *args, **kwargs)
 
     return decorated
 
+@app.route('/ocurrences/<ocurrence_id>', methods=['GET']
+@token_required
+def get_ocurrence(user, role, ocurrence_id):
+
 @app.route('/ocurrences', methods=['POST', 'GET'])
 @token_required
-def create_ocurrence(user):
+def create_ocurrence(user, role):
     if request.method == 'POST':
         data = request.get_json()
         error = 0
@@ -346,7 +350,7 @@ def status_email(eMail):
 
 @app.route('/me', methods=['GET'])
 @token_required
-def get_one_user(user):
+def get_one_user(user, role):
     user_data = {}
     user_data['_id'] = user._id
     user_data['name'] = user.name
@@ -370,7 +374,7 @@ def get_one_user(user):
 
 @app.route('/user', methods=['PUT'])
 @token_required
-def update_usuario(user):
+def update_usuario(user, role):
     
     data = request.get_json()
     user.name=data['name']
