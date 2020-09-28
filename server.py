@@ -52,7 +52,7 @@ class cliente(db.Model):
     number = db.Column(db.Integer)
     complement = db.Column(db.String(40))
     phone = db.Column(db.String(15))
-    role = db.Column(db.Boolean)
+    role = db.Column(db.String(15))
 
 class ocorrencia(db.Model):
     _id = db.Column(db.Integer, primary_key=True)
@@ -295,7 +295,7 @@ def create_user():
     new_user = cliente(name=data['name'],
                     password=data['password'],
                     email=data['email'],
-                    role=True,
+                    role="user",
                     zip_code=data['zip_code'],
                     latitude=data['latitude'],
                     longitude=data['longitude'],
@@ -332,7 +332,7 @@ def login():
         return make_response('', 401)
     
     if user.password == auth['password']:
-        token = jwt.encode({'_id':user._id, 'name': user.name}, app.config['SECRET_KEY'])
+        token = jwt.encode({'_id':user._id, 'name': user.name, 'role':user.role}, app.config['SECRET_KEY'])
         return jsonify({'token' : token.decode('UTF-8')})
     return make_response('', 401)
     
