@@ -116,7 +116,7 @@ def get_ocurrence(user, role, ocurrence_id):
             return make_response('Usuário não existe',400)
         user_data['user_name'] = user_d.name
         user_data['user_id'] = i.user_id
-    return jsonfy(user_data)
+    return jsonify(user_data)
     
 @app.route('/ocurrences/me', methods=['GET'])
 @token_required
