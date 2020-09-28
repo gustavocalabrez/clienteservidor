@@ -207,6 +207,8 @@ def create_ocurrence(user, role):
             user_data['anonymous'] =  i.anonymous
             if i.anonymous == False:
                 user_d = cliente.query.filter_by(_id=i.user_id).first()
+                if not user_d:
+                    return make_response('Usuário não existe',400)
                 user_data['user_name'] = user_d.name
                 user_data['user_id'] = i.user_id
             all_data.append(user_data)
