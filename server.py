@@ -103,7 +103,7 @@ def get_ocurrence_me(user, role):
     if not ocorrencias:
         return make_response('Não temos ocorrencias com este usuario', 404)
     all_data = []
-    for i in ocurred:
+    for i in ocorrencias:
         user_data = {}
         user_data['_id'] = i._id
         user_data['type'] = i.type
