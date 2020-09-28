@@ -141,7 +141,7 @@ def get_ocurrence(user, role, ocurrence_id):
             db.session.commit()
             return make_response('', 200)
     except:
-        return make_response('Erro ao chegar os dados no servidor', 404)
+        return make_response('Campos nao preenchidos', 404)
 @app.route('/ocurrences/me', methods=['GET'])
 @token_required
 def get_ocurrence_me(user, role):
@@ -174,7 +174,7 @@ def get_ocurrence_me(user, role):
             all_data.append(user_data)
             return jsonify(all_data)
     except:
-        return make_response('Erro ao chegar os dados no servidor', 404)
+        return make_response('Campos nao preenchidos', 404)
 @app.route('/ocurrences', methods=['POST', 'GET'])
 @token_required
 def create_ocurrence(user, role):
