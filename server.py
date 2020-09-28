@@ -98,8 +98,8 @@ def get_ocurrence(user, role, ocurrence_id):
 @app.route('/ocurrences/me', methods=['GET'])
 @token_required
 def get_ocurrence_me(user, role):
-    print(user['email'])
-    ocorrencias = ocorrencia.query.filter_by(user_id = user['_id']).all()
+    print(user.email)
+    ocorrencias = ocorrencia.query.filter_by(user_id = user._id]).all()
     if not ocorrencias:
         return make_response('Não temos ocorrencias com este usuario', 404)
     for i in ocorrencias:
