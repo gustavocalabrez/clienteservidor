@@ -91,10 +91,10 @@ def token_required(f):
 
     return decorated
 
-@app.route('/ocurrences/<ocurrence_id>', methods=['GET']
+@app.route('/ocurrences/<ocurrence_id>', methods=['GET'])
 @token_required
 def get_ocurrence(user, role, ocurrence_id):
-
+    pass
 @app.route('/ocurrences', methods=['POST', 'GET'])
 @token_required
 def create_ocurrence(user, role):
