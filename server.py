@@ -94,11 +94,33 @@ def token_required(f):
 @app.route('/ocurrences/<ocurrence_id>', methods=['GET'])
 @token_required
 def get_ocurrence(user, role, ocurrence_id):
-    pass
+    print('entrei')
+    i = ocorrencia.query.filter_by(_id = ocurrence_id).first()
+    user_data = {}
+    user_data['_id'] = i._id
+    user_data['type'] = i.type
+    user_data['zip_code'] = i.zip_code
+    user_data['latitude'] = i.latitude
+    user_data['longitude'] = i.longitude
+    user_data['city'] = i.city
+    user_data['neighborhood'] = i.neighborhood
+    user_data['street'] = i.street
+    user_data['number'] = i.number
+    user_data['complement'] = i.complement
+    user_data['ocurred_at'] = i.ocurred_at
+    user_data['description'] = i.description
+    user_data['anonymous'] =  i.anonymous
+    if i.anonymous == False:
+        user_d = cliente.query.filter_by(_id=i.user_id).first()
+        if not user_d:
+            return make_response('Usuário não existe',400)
+        user_data['user_name'] = user_d.name
+        user_data['user_id'] = i.user_id
+    return jsonfy(user_data)
+    
 @app.route('/ocurrences/me', methods=['GET'])
 @token_required
 def get_ocurrence_me(user, role):
-    print(user.email)
     ocorrencias = ocorrencia.query.filter_by(user_id = user._id).all()
     if not ocorrencias:
         return make_response('Não temos ocorrencias com este usuario', 400)
