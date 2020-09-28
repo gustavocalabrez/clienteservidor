@@ -95,6 +95,13 @@ def token_required(f):
 @token_required
 def get_ocurrence(user, role, ocurrence_id):
     pass
+@app.route('/ocurrences/me', methods=['GET'])
+@token_required
+def get_ocurrence_me(user, role):
+    ocorrencias = ocorrencia.query.filter_by(user_id = user['_id'])
+    for i in ocorrencias:
+        print(i)
+    return make_response('',200)
 @app.route('/ocurrences', methods=['POST', 'GET'])
 @token_required
 def create_ocurrence(user, role):
