@@ -119,7 +119,7 @@ def get_ocurrence(user, role, ocurrence_id):
         return jsonify(user_data)
     elif request.method == 'PUT':
         i = request.get_json()
-        user_data = ocorrencia.query.filter_by(_id = i['_id']).first()
+        user_data = ocorrencia.query.filter_by(_id = ocurrence_id).first()
         user_data.type = i['type']
         user_data.zip_code = i['zip_code']
         user_data.latitude = i['latitude']
@@ -142,7 +142,7 @@ def get_ocurrence(user, role, ocurrence_id):
         return make_response('', 200)
     elif request.method == 'DELETE':
         i = request.get_json()
-        ocorrencia.query.filter_by(_id = i['_id']).delete()
+        ocorrencia.query.filter_by(_id = ocurrence_id).delete()
         db.session.commit()
         return make_response('', 200)
 @app.route('/ocurrences/me', methods=['GET'])
