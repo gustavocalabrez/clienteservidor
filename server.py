@@ -101,7 +101,7 @@ def get_ocurrence_me(user, role):
     print(user.email)
     ocorrencias = ocorrencia.query.filter_by(user_id = user._id).all()
     if not ocorrencias:
-        return make_response('Não temos ocorrencias com este usuario', 404)
+        return make_response('Não temos ocorrencias com este usuario', 400)
     all_data = []
     for i in ocorrencias:
         user_data = {}
@@ -125,8 +125,7 @@ def get_ocurrence_me(user, role):
             user_data['user_name'] = user_d.name
             user_data['user_id'] = i.user_id
         all_data.append(user_data)
-        print(all_data)
-    return make_response('',200)
+        return jsonify(all_data)
 @app.route('/ocurrences', methods=['POST', 'GET'])
 @token_required
 def create_ocurrence(user, role):
