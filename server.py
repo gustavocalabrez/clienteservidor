@@ -94,177 +94,63 @@ def token_required(f):
 @app.route('/ocurrences/<ocurrence_id>', methods=['GET', 'DELETE', 'PUT'])
 @token_required
 def get_ocurrence(user, role, ocurrence_id):
-    if request.method == 'GET':
-        i = ocorrencia.query.filter_by(_id = ocurrence_id).first()
-        user_data = {}
-        user_data['_id'] = i._id
-        user_data['type'] = i.type
-        user_data['zip_code'] = i.zip_code
-        user_data['latitude'] = i.latitude
-        user_data['longitude'] = i.longitude
-        user_data['city'] = i.city
-        user_data['neighborhood'] = i.neighborhood
-        user_data['street'] = i.street
-        user_data['number'] = i.number
-        user_data['complement'] = i.complement
-        user_data['ocurred_at'] = i.ocurred_at
-        user_data['description'] = i.description
-        user_data['anonymous'] =  i.anonymous
-        if i.anonymous == False:
-            user_d = cliente.query.filter_by(_id=i.user_id).first()
-            if not user_d:
-                return make_response('Usuário não existe',400)
-            user_data['user_name'] = user_d.name
-            user_data['user_id'] = i.user_id
-        return jsonify(user_data)
-    elif request.method == 'PUT':
-        i = request.get_json()
-        user_data = ocorrencia.query.filter_by(_id = ocurrence_id).first()
-        user_data.type = i['type']
-        user_data.zip_code = i['zip_code']
-        user_data.latitude = i['latitude']
-        user_data.longitude = i['longitude']
-        user_data.city = i['city']
-        user_data.neighborhood = i['neighborhood']
-        user_data.street = i['street']
-        user_data.number = i['number']
-        user_data.complement = i['complement']
-        user_data.ocurred_at = i['ocurred_at']
-        user_data.description = i['description']
-        user_data.anonymous =  i['anonymous']
-        db.session.commit()
-        return make_response('', 200)
-    elif request.method == 'DELETE':
-        i = request.get_json()
-        ocorrencia.query.filter_by(_id = ocurrence_id).delete()
-        db.session.commit()
-        return make_response('', 200)
+    try:
+        if request.method == 'GET':
+            i = ocorrencia.query.filter_by(_id = ocurrence_id).first()
+            user_data = {}
+            user_data['_id'] = i._id
+            user_data['type'] = i.type
+            user_data['zip_code'] = i.zip_code
+            user_data['latitude'] = i.latitude
+            user_data['longitude'] = i.longitude
+            user_data['city'] = i.city
+            user_data['neighborhood'] = i.neighborhood
+            user_data['street'] = i.street
+            user_data['number'] = i.number
+            user_data['complement'] = i.complement
+            user_data['ocurred_at'] = i.ocurred_at
+            user_data['description'] = i.description
+            user_data['anonymous'] =  i.anonymous
+            if i.anonymous == False:
+                user_d = cliente.query.filter_by(_id=i.user_id).first()
+                if not user_d:
+                    return make_response('Usuário não existe',400)
+                user_data['user_name'] = user_d.name
+                user_data['user_id'] = i.user_id
+            return jsonify(user_data)
+        elif request.method == 'PUT':
+            i = request.get_json()
+            user_data = ocorrencia.query.filter_by(_id = ocurrence_id).first()
+            user_data.type = i['type']
+            user_data.zip_code = i['zip_code']
+            user_data.latitude = i['latitude']
+            user_data.longitude = i['longitude']
+            user_data.city = i['city']
+            user_data.neighborhood = i['neighborhood']
+            user_data.street = i['street']
+            user_data.number = i['number']
+            user_data.complement = i['complement']
+            user_data.ocurred_at = i['ocurred_at']
+            user_data.description = i['description']
+            user_data.anonymous =  i['anonymous']
+            db.session.commit()
+            return make_response('', 200)
+        elif request.method == 'DELETE':
+            i = request.get_json()
+            ocorrencia.query.filter_by(_id = ocurrence_id).delete()
+            db.session.commit()
+            return make_response('', 200)
+    except:
+        return make_response('Erro ao chegar os dados no servidor', 404)
 @app.route('/ocurrences/me', methods=['GET'])
 @token_required
 def get_ocurrence_me(user, role):
-    ocorrencias = ocorrencia.query.filter_by(user_id = user._id).all()
-    if not ocorrencias:
-        return make_response('Não temos ocorrencias com este usuario', 400)
-    all_data = []
-    for i in ocorrencias:
-        user_data = {}
-        user_data['_id'] = i._id
-        user_data['type'] = i.type
-        user_data['zip_code'] = i.zip_code
-        user_data['latitude'] = i.latitude
-        user_data['longitude'] = i.longitude
-        user_data['city'] = i.city
-        user_data['neighborhood'] = i.neighborhood
-        user_data['street'] = i.street
-        user_data['number'] = i.number
-        user_data['complement'] = i.complement
-        user_data['ocurred_at'] = i.ocurred_at
-        user_data['description'] = i.description
-        user_data['anonymous'] =  i.anonymous
-        if i.anonymous == False:
-            user_d = cliente.query.filter_by(_id=i.user_id).first()
-            if not user_d:
-                return make_response('Usuário não existe',400)
-            user_data['user_name'] = user_d.name
-            user_data['user_id'] = i.user_id
-        all_data.append(user_data)
-        return jsonify(all_data)
-@app.route('/ocurrences', methods=['POST', 'GET'])
-@token_required
-def create_ocurrence(user, role):
-    if request.method == 'POST':
-        data = request.get_json()
-        error = 0
-        response = 'Campos obrigatórios não preenchidos em: '
-        if not 'type' in data:
-            error = 1
-            response += 'type '
-        if not 'ocurred_at' in data:
-            error = 1
-            response += 'ocurred_at '
-        if not 'zip_code' in data:
-            error = 1
-            response += 'zip_code '
-        if not 'latitude' in data:
-            error = 1
-            response += 'latitude '
-        if not 'longitude' in data:
-            error = 1
-            response += 'longitude '
-        if not 'city' in data:
-            error = 1
-            response += 'city '
-        if not 'neighborhood' in data:
-            error = 1
-            response += 'neighborhood '
-        if not 'street' in data:
-            error = 1
-            response += 'street '
-        if not 'anonymous' in data:
-            error = 1
-            response += 'anonymous '
-        if not 'description' in data:
-            error = 1
-            response += 'description '
-        if error == 1:
-            return jsonify({'error':response}), 400
-
-        if data['type'] == '':
-            error = 1
-            response += 'type '
-        if data['ocurred_at'] == '':
-            error = 1
-            response += 'ocurred_at '
-        if data['zip_code'] == '':
-            error = 1
-            response += 'zip_code '
-        if data['latitude'] == '' or data['latitude'] == 0:
-            error = 1
-            response += 'latitude '
-        if data['longitude'] == ''or data['longitude'] == 0:
-            error = 1
-            response += 'longitude '
-        if data['city'] == '':
-            error = 1
-            response += 'city '
-        if data['neighborhood'] == '':
-            error = 1
-            response += 'neighborhood '
-        if data['street'] == '':
-            error = 1
-            response += 'street '
-        if data['anonymous'] == '':
-            error = 1
-            response += 'anonymous '
-        if data['description'] == '':
-            error = 1
-            response += 'description '
-        if error == 1:
-            return jsonify({'error':response}), 400
-
-        ocurred = ocorrencia(type=data['type'],
-                        zip_code=data['zip_code'],
-                        latitude=data['latitude'],
-                        longitude=data['longitude'],
-                        city=data['city'],
-                        neighborhood=data['neighborhood'],
-                        street=data['street'],
-                        number=data['number'],
-                        complement=data['complement'],
-                        ocurred_at=data['ocurred_at'],
-                        description=data['description'],
-                        anonymous=data['anonymous'],
-                        user_id = user._id
-                        )
-
-        db.session.add(ocurred)
-        db.session.commit()
-        
-        return make_response('', 201)
-    elif request.method == 'GET':
-        ocurred = ocorrencia.query.all()
+    try:
+        ocorrencias = ocorrencia.query.filter_by(user_id = user._id).all()
+        if not ocorrencias:
+            return make_response('Não temos ocorrencias com este usuario', 400)
         all_data = []
-        for i in ocurred:
+        for i in ocorrencias:
             user_data = {}
             user_data['_id'] = i._id
             user_data['type'] = i.type
@@ -286,111 +172,236 @@ def create_ocurrence(user, role):
                 user_data['user_name'] = user_d.name
                 user_data['user_id'] = i.user_id
             all_data.append(user_data)
-        return jsonify(all_data)
+            return jsonify(all_data)
+    except:
+        return make_response('Erro ao chegar os dados no servidor', 404)
+@app.route('/ocurrences', methods=['POST', 'GET'])
+@token_required
+def create_ocurrence(user, role):
+    try:
+        if request.method == 'POST':
+            data = request.get_json()
+            error = 0
+            response = 'Campos obrigatórios não preenchidos em: '
+            if not 'type' in data:
+                error = 1
+                response += 'type '
+            if not 'ocurred_at' in data:
+                error = 1
+                response += 'ocurred_at '
+            if not 'zip_code' in data:
+                error = 1
+                response += 'zip_code '
+            if not 'latitude' in data:
+                error = 1
+                response += 'latitude '
+            if not 'longitude' in data:
+                error = 1
+                response += 'longitude '
+            if not 'city' in data:
+                error = 1
+                response += 'city '
+            if not 'neighborhood' in data:
+                error = 1
+                response += 'neighborhood '
+            if not 'street' in data:
+                error = 1
+                response += 'street '
+            if not 'anonymous' in data:
+                error = 1
+                response += 'anonymous '
+            if not 'description' in data:
+                error = 1
+                response += 'description '
+            if error == 1:
+                return jsonify({'error':response}), 400
+
+            if data['type'] == '':
+                error = 1
+                response += 'type '
+            if data['ocurred_at'] == '':
+                error = 1
+                response += 'ocurred_at '
+            if data['zip_code'] == '':
+                error = 1
+                response += 'zip_code '
+            if data['latitude'] == '' or data['latitude'] == 0:
+                error = 1
+                response += 'latitude '
+            if data['longitude'] == ''or data['longitude'] == 0:
+                error = 1
+                response += 'longitude '
+            if data['city'] == '':
+                error = 1
+                response += 'city '
+            if data['neighborhood'] == '':
+                error = 1
+                response += 'neighborhood '
+            if data['street'] == '':
+                error = 1
+                response += 'street '
+            if data['anonymous'] == '':
+                error = 1
+                response += 'anonymous '
+            if data['description'] == '':
+                error = 1
+                response += 'description '
+            if error == 1:
+                return jsonify({'error':response}), 400
+
+            ocurred = ocorrencia(type=data['type'],
+                            zip_code=data['zip_code'],
+                            latitude=data['latitude'],
+                            longitude=data['longitude'],
+                            city=data['city'],
+                            neighborhood=data['neighborhood'],
+                            street=data['street'],
+                            number=data['number'],
+                            complement=data['complement'],
+                            ocurred_at=data['ocurred_at'],
+                            description=data['description'],
+                            anonymous=data['anonymous'],
+                            user_id = user._id
+                            )
+
+            db.session.add(ocurred)
+            db.session.commit()
+
+            return make_response('', 201)
+        elif request.method == 'GET':
+            ocurred = ocorrencia.query.all()
+            all_data = []
+            for i in ocurred:
+                user_data = {}
+                user_data['_id'] = i._id
+                user_data['type'] = i.type
+                user_data['zip_code'] = i.zip_code
+                user_data['latitude'] = i.latitude
+                user_data['longitude'] = i.longitude
+                user_data['city'] = i.city
+                user_data['neighborhood'] = i.neighborhood
+                user_data['street'] = i.street
+                user_data['number'] = i.number
+                user_data['complement'] = i.complement
+                user_data['ocurred_at'] = i.ocurred_at
+                user_data['description'] = i.description
+                user_data['anonymous'] =  i.anonymous
+                if i.anonymous == False:
+                    user_d = cliente.query.filter_by(_id=i.user_id).first()
+                    if not user_d:
+                        return make_response('Usuário não existe',400)
+                    user_data['user_name'] = user_d.name
+                    user_data['user_id'] = i.user_id
+                all_data.append(user_data)
+            return jsonify(all_data)
+    except:
+        return make_response('Erro servidor', 404)
     
 @app.route('/user', methods=['POST'])
 def create_user():
+    try:
+        data = request.get_json()
 
-    data = request.get_json()
+        error = 0
+        response = 'Campos obrigatórios não preenchidos em: '
+        if not 'name' in data:
+            error = 1
+            response += 'name '
+        if not 'password' in data:
+            error = 1
+            response += 'password ' 
+        if not 'email' in data:
+            error = 1
+            response += 'email '        
+        if not 'zip_code' in data:
+            error = 1
+            response += 'zip_code '        
+        if not 'latitude' in data:
+            error = 1
+            response += 'latitude '        
+        if not 'longitude' in data:
+            error = 1
+            response += 'longitude '        
+        if not 'city' in data:
+            error = 1
+            response += 'city '        
+        if not 'neighborhood' in data:
+            error = 1
+            response += 'neighborhood '        
+        if not 'street' in data:
+            error = 1
+            response += 'street '        
+        if not 'number' in data:
+            error = 1
+            response += 'number '       
+        if not 'phone' in data:
+            error = 1
+            response += 'phone '        
 
-    error = 0
-    response = 'Campos obrigatórios não preenchidos em: '
-    if not 'name' in data:
-        error = 1
-        response += 'name '
-    if not 'password' in data:
-        error = 1
-        response += 'password ' 
-    if not 'email' in data:
-        error = 1
-        response += 'email '        
-    if not 'zip_code' in data:
-        error = 1
-        response += 'zip_code '        
-    if not 'latitude' in data:
-        error = 1
-        response += 'latitude '        
-    if not 'longitude' in data:
-        error = 1
-        response += 'longitude '        
-    if not 'city' in data:
-        error = 1
-        response += 'city '        
-    if not 'neighborhood' in data:
-        error = 1
-        response += 'neighborhood '        
-    if not 'street' in data:
-        error = 1
-        response += 'street '        
-    if not 'number' in data:
-        error = 1
-        response += 'number '       
-    if not 'phone' in data:
-        error = 1
-        response += 'phone '        
+        if error == 1:
+            return jsonify({'error':response}), 400
 
-    if error == 1:
-        return jsonify({'error':response}), 400
-    
-    if status_email(data['email']) == True:
-        return jsonify({'error':response}), 400
-        
-    if data['name'] == '':
-        error = 1
-        response += 'name '
-    if data['password'] == '':
-        error = 1
-        response += 'password '
-    if data['email'] == '':
-        error = 1
-        response += 'email ' 
-    if data['zip_code'] == '':
-        error = 1
-        response += 'zip_code '
-    if data['latitude'] == '' or data['latitude'] == 0.0:
-        error = 1
-        response += 'latitude '
-    if data['longitude'] == '' or data['longitude'] == 0.0:
-        error = 1
-        response += 'longitude '
-    if data['city'] == '':
-        error = 1
-        response += 'city '
-    if data['neighborhood'] == '':
-        error = 1
-        response += 'neighborhood '
-    if data['street'] == '':
-        error = 1
-        response += 'street '
-    if data['number'] == '' or data['number'] == 0:
-        error = 1
-        response += 'number ' 
-    if data['phone'] == '':
-        error = 1
-        response += 'phone '
-    if error == 1:
-        return jsonify({'error':response}), 400
+        if status_email(data['email']) == True:
+            return jsonify({'error':response}), 400
 
-   
-    new_user = cliente(name=data['name'],
-                    password=data['password'],
-                    email=data['email'],
-                    role="user",
-                    zip_code=data['zip_code'],
-                    latitude=data['latitude'],
-                    longitude=data['longitude'],
-                    city=data['city'],
-                    neighborhood=data['neighborhood'],
-                    street=data['street'],
-                    number=data['number'],
-                    complement=data['complement'],
-                    phone=data['phone']
-                    )
+        if data['name'] == '':
+            error = 1
+            response += 'name '
+        if data['password'] == '':
+            error = 1
+            response += 'password '
+        if data['email'] == '':
+            error = 1
+            response += 'email ' 
+        if data['zip_code'] == '':
+            error = 1
+            response += 'zip_code '
+        if data['latitude'] == '' or data['latitude'] == 0.0:
+            error = 1
+            response += 'latitude '
+        if data['longitude'] == '' or data['longitude'] == 0.0:
+            error = 1
+            response += 'longitude '
+        if data['city'] == '':
+            error = 1
+            response += 'city '
+        if data['neighborhood'] == '':
+            error = 1
+            response += 'neighborhood '
+        if data['street'] == '':
+            error = 1
+            response += 'street '
+        if data['number'] == '' or data['number'] == 0:
+            error = 1
+            response += 'number ' 
+        if data['phone'] == '':
+            error = 1
+            response += 'phone '
+        if error == 1:
+            return jsonify({'error':response}), 400
 
-    db.session.add(new_user)
-    db.session.commit()
 
-    return  make_response('', 201)
+        new_user = cliente(name=data['name'],
+                        password=data['password'],
+                        email=data['email'],
+                        role="user",
+                        zip_code=data['zip_code'],
+                        latitude=data['latitude'],
+                        longitude=data['longitude'],
+                        city=data['city'],
+                        neighborhood=data['neighborhood'],
+                        street=data['street'],
+                        number=data['number'],
+                        complement=data['complement'],
+                        phone=data['phone']
+                        )
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        return  make_response('', 201)
+    except:
+        return  make_response('Erro no servidor', 404)
 
 @app.route('/get_token', methods=['GET'])
 def get_token():
@@ -405,16 +416,18 @@ def login():
     
     if not auth or not auth['email'] or not auth['password']:
         return make_response('', 401)
-    
-    user = cliente.query.filter_by(email=auth['email']).first()
+    try:
+        user = cliente.query.filter_by(email=auth['email']).first()
 
-    if not user:
-        return make_response('', 401)
+        if not user:
+            return make_response('', 401)
     
-    if user.password == auth['password']:
-        token = jwt.encode({'_id':user._id, 'name': user.name, 'role':user.role}, app.config['SECRET_KEY'])
-        return jsonify({'token' : token.decode('UTF-8')})
-    return make_response('', 401)
+        if user.password == auth['password']:
+            token = jwt.encode({'_id':user._id, 'name': user.name, 'role':user.role}, app.config['SECRET_KEY'])
+            return jsonify({'token' : token.decode('UTF-8')})
+        return make_response('', 401)
+    except:
+        return make_response('Senha ou usuário invalido', 404)
     
 def status_email(eMail):
     check_mail = cliente.query.filter_by(email=eMail).first()
