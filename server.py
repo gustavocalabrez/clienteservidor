@@ -133,6 +133,7 @@ def get_ocurrence(user, role, ocurrence_id):
         user_data.description = i['description']
         user_data.anonymous =  i['anonymous']
         if i['anonymous'] == False:
+            print(i)
             user_d = cliente.query.filter_by(_id=i['user_id']).first()
             if not user_d:
                 return make_response('Usuário não existe',400)
