@@ -120,8 +120,8 @@ def get_ocurrence(user, role, ocurrence_id):
     elif request.method == 'PUT':
         i = request.get_json()
         print(i)
+        '''
         user_data = ocorrencia.query.filter_by(_id = i['_id']).first()
-        print(i.id,i.type)
         user_data['type'] = i.type
         user_data['zip_code'] = i.zip_code
         user_data['latitude'] = i.latitude
@@ -141,6 +141,7 @@ def get_ocurrence(user, role, ocurrence_id):
             user_data['user_name'] = user_d.name
             user_data['user_id'] = i.user_id
         db.session.commit()
+        ''''
         return make_response('', 200)
     
 @app.route('/ocurrences/me', methods=['GET'])
